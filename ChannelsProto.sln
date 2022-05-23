@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebCrawlerCore", "WebCrawlerCore\WebCrawlerCore.csproj", "{8DD39370-85D0-4EB6-A4CD-9CFCFF8FAF30}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChannelsCrawler", "ChannelsCrawler\ChannelsCrawler.csproj", "{690F8752-972E-4571-8D52-FBC0CB4D95A4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskCrawler", "TaskCrawler\TaskCrawler.csproj", "{FA56075D-6837-4411-9E51-D6643E538AFC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SyncCrawler", "SyncCrawler\SyncCrawler.csproj", "{83A0068E-7A74-4B95-8F3D-C8296D1D0B26}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildScripts", "BuildScripts", "{5E3635D2-C7ED-43B9-A8C8-2AE03571714A}"
+	ProjectSection(SolutionItems) = preProject
+		crawl-channels.bat = crawl-channels.bat
+		crawl-sync.bat = crawl-sync.bat
+		crawl-task.bat = crawl-task.bat
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8DD39370-85D0-4EB6-A4CD-9CFCFF8FAF30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DD39370-85D0-4EB6-A4CD-9CFCFF8FAF30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DD39370-85D0-4EB6-A4CD-9CFCFF8FAF30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DD39370-85D0-4EB6-A4CD-9CFCFF8FAF30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{690F8752-972E-4571-8D52-FBC0CB4D95A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{690F8752-972E-4571-8D52-FBC0CB4D95A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{690F8752-972E-4571-8D52-FBC0CB4D95A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{690F8752-972E-4571-8D52-FBC0CB4D95A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA56075D-6837-4411-9E51-D6643E538AFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA56075D-6837-4411-9E51-D6643E538AFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA56075D-6837-4411-9E51-D6643E538AFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA56075D-6837-4411-9E51-D6643E538AFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83A0068E-7A74-4B95-8F3D-C8296D1D0B26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83A0068E-7A74-4B95-8F3D-C8296D1D0B26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83A0068E-7A74-4B95-8F3D-C8296D1D0B26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83A0068E-7A74-4B95-8F3D-C8296D1D0B26}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {90DECB04-5859-407D-BCC6-8061AD2AA51F}
+	EndGlobalSection
+EndGlobal
