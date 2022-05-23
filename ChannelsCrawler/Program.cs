@@ -28,9 +28,10 @@ namespace ChannelsCrawler
             var writingTask = StorePagesAsync(log, channel.Reader).ConfigureAwait(true);
             try
             {
-                var crawlingTasks = args
-                    .Select(x => new Uri(x))
-                    .Select((x, i) => CrawlOneAsync(x, channel.Writer, log, i))
+                var uris = args.Select(x => new Uri(x)).ToArray();
+                var logs = uris.Select(x => ConsoleLog.Create(typeof(Program), cid: x.Host)).ToArray();
+                var crawlingTasks = uris
+                    .Select((x, i) => CrawlOneAsync(x, channel.Writer, logs[i], i))
                     .ToArray();
 
                 await Task.WhenAll(crawlingTasks).ConfigureAwait(false);
@@ -46,21 +47,21 @@ namespace ChannelsCrawler
 
         static async Task CrawlOneAsync(Uri url, ChannelWriter<WebPage> output, ILog log, int index)
         {
-            var crawler = new WebCrawler(new HttpClient(), ConsoleLog.Create<WebCrawler>(cid: url.Host), url);
+            var crawler = new WebCrawler(new HttpClient(), log.CreateSubLog<WebCrawler>(), url);
 
-            log.WriteEntry("[crawlerIx:{0}]Beginning crawl through {1}", index, url);
+            log.WriteEntry("Beginning crawl through {0}", url);
             while (!crawler.Done)
             {
                 WebPage page = await crawler.CrawlNextAsync().ConfigureAwait(false);
                 if (page != null)
                 {
                     await output.WriteAsync(page).ConfigureAwait(false);
-                    log.WriteEntry("[crawlerIx:{0}]Pushed result page", index);
+                    log.WriteEntry("Pushed result page");
                 }
 
                 await Task.Delay(crawlDelay).ConfigureAwait(false);
             }
-            log.WriteEntry("[crawlerIx:{0}]Finished crawling {1}", index, url);
+            log.WriteEntry("Finished crawling {0}", index, url);
         }
 
         static async Task StorePagesAsync(ILog log, ChannelReader<WebPage> input)
@@ -69,7 +70,7 @@ namespace ChannelsCrawler
             File.Delete(resultsArchive);
 
             using (var outZip = ZipFile.Open(resultsArchive, ZipArchiveMode.Create))
-            using (var pageStore = new ZipArchiveWebPageStore(outZip, ConsoleLog.Create<ZipArchiveWebPageStore>()))
+            using (var pageStore = new ZipArchiveWebPageStore(outZip, ConsoleLog.Create<ZipArchiveWebPageStore>(cid: "zip")))
             {
                 log.WriteEntry("Created new archive {0}", resultsArchive);
 

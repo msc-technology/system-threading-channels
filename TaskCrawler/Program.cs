@@ -29,15 +29,16 @@ namespace TaskCrawler
             File.Delete(resultsArchive);
 
             using (var outZip = ZipFile.Open(resultsArchive, ZipArchiveMode.Create))
-            using (var pageStore = new ZipArchiveWebPageStore(outZip, ConsoleLog.Create<ZipArchiveWebPageStore>()))
+            using (var pageStore = new ZipArchiveWebPageStore(outZip, ConsoleLog.Create<ZipArchiveWebPageStore>(cid: "zip")))
             {
                 log.WriteEntry("Created new archive {0}", resultsArchive);
 
                 var uris = args.Select(x => new Uri(x)).ToArray();
-                var crawlers = uris.Select(x => new WebCrawler(new HttpClient(), ConsoleLog.Create<WebCrawler>(cid: x.Host), x)).ToArray();
+                var logs = uris.Select(x => ConsoleLog.Create(typeof(Program), cid: x.Host)).ToArray();
+                var crawlers = uris.Select((x, i) => new WebCrawler(new HttpClient(), logs[i].CreateSubLog<WebCrawler>(), x)).ToArray();
 
                 foreach (var i in Enumerable.Range(0, uris.Length))
-                    log.WriteEntry("[crawlerIx:{0}]Beginning crawl through {1}", i, uris[i]);
+                    log.WriteEntry("Beginning crawl through {0}", uris[i]);
 
                 var crawlTasks = crawlers.Select(x => x.CrawlNextAsync()).ToArray();
                 do
@@ -49,10 +50,10 @@ namespace TaskCrawler
                     crawlTasks[finishedIndex] = crawler.Done ? nullTask : CreateNextTask(crawler);
 
                     await pageStore.StorePageAsync(await finishedTask).ConfigureAwait(false);
-                    log.WriteEntry("[crawlerIx:{0}]Pushed result page", finishedIndex);
+                    log.WriteEntry("Pushed result page");
 
                     if (crawler.Done)
-                        log.WriteEntry("[crawlerIx:{0}]Finished crawling {1}", finishedIndex, uris[finishedIndex]);
+                        log.WriteEntry("Finished crawling {0}", uris[finishedIndex]);
                 }
                 while (crawlers.Any(x => !x.Done));
             }

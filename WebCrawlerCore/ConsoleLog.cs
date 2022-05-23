@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 
 namespace WebCrawlerCore
@@ -7,6 +8,7 @@ namespace WebCrawlerCore
     {
         private readonly string ownerName;
         private readonly string cid;
+        private readonly StringBuilder messageBuilder = new StringBuilder();
 
         public static ILog Create<TOwner>(string cid = null) => new ConsoleLog(typeof(TOwner).Name, cid);
         public static ILog Create(Type owner, string cid = null) => new ConsoleLog(owner.Name, cid);
@@ -22,10 +24,15 @@ namespace WebCrawlerCore
         {
             var threadId = Thread.CurrentThread.ManagedThreadId;
 
-            Console.Write("[thread:{0}]", threadId);
-            Console.Write("[owner:{0}]", ownerName);
-            Console.Write("[cid:{0}]", cid ?? " ");
-            Console.WriteLine(format, values);
+            messageBuilder.AppendFormat("[thread:{0:D2}]", threadId);
+            messageBuilder.AppendFormat("[cid:{0}]", cid ?? " ");
+            messageBuilder.AppendFormat("[owner:{0}]", ownerName);
+            messageBuilder.AppendFormat(format, values);
+
+            var msg = messageBuilder.ToString();
+            messageBuilder.Clear();
+
+            Console.WriteLine(msg);
         }
 
         public ILog CreateSubLog<TOwner>()

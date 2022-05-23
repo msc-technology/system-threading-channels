@@ -24,7 +24,7 @@ namespace WebCrawlerCore
         private readonly HashSet<Uri> urlsFetched;
 
         public bool Done => !urlsToFetch.Any() || urlsFetched.Count >= 10;
-        
+
         public WebCrawler(HttpClient httpClient, ILog log, Uri firstPage)
         {
             this.httpClient = httpClient;
@@ -36,49 +36,62 @@ namespace WebCrawlerCore
 
         public async Task<WebPage> CrawlNextAsync()
         {
-            if (Done)
-                return null;
-
-            var url = urlsToFetch.First();
-            urlsToFetch.Remove(url);
-
-            var notAlreadyDownloaded = urlsFetched.Add(url);
-
-            if(notAlreadyDownloaded)
-                log.WriteEntry("Next url: {0}", url);
-            else
+            try
             {
-                log.WriteEntry("Skipped, already downloaded");
-                return null;
-            }
+                if (Done)
+                    return null;
 
-            var httpResponse = await httpClient.GetAsync(url).ConfigureAwait(false);
-            if (!httpResponse.IsSuccessStatusCode)
-            {
-                log.WriteEntry("No response");
-                return null;
-            }
+                var url = urlsToFetch.First();
+                urlsToFetch.Remove(url);
 
-            var httpResponseBody = await httpResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-            var page = new WebPage(url, httpResponseBody);
+                var notAlreadyDownloaded = urlsFetched.Add(url);
 
-            using (var pageBody = page.OpenBody())
-            using (var pageReader = new StreamReader(pageBody))
-            {
-                log.WriteEntry("Matching urls in page");
-
-                string line;
-                int absoluteUrlCount = 0;
-                int relativeUrlCount = 0;
-                while ((line = await pageReader.ReadLineAsync().ConfigureAwait(false)) != null)
+                if (notAlreadyDownloaded)
+                    log.WriteEntry("Next url: {0}", url);
+                else
                 {
-                    absoluteUrlCount += FindNewAbsoluteUrls(line);
-                    relativeUrlCount += FindNewRelativeUrls(page.PageUrl, line);
+                    log.WriteEntry("Skipped, already downloaded");
+                    return null;
                 }
-                log.WriteEntry("Found {0} absolute and {1} relative new urls", absoluteUrlCount, relativeUrlCount);
-            }
 
-            return page;
+                var httpResponse = await httpClient.GetAsync(url).ConfigureAwait(false);
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    log.WriteEntry("No response");
+                    return null;
+                }
+
+                var httpResponseBody = await httpResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                var page = new WebPage(url, httpResponseBody);
+
+                using (var pageBody = page.OpenBody())
+                using (var pageReader = new StreamReader(pageBody))
+                {
+                    log.WriteEntry("Matching urls in page");
+
+                    string line;
+                    int absoluteUrlCount = 0;
+                    int relativeUrlCount = 0;
+                    while ((line = await pageReader.ReadLineAsync().ConfigureAwait(false)) != null)
+                    {
+                        absoluteUrlCount += FindNewAbsoluteUrls(line);
+                        relativeUrlCount += FindNewRelativeUrls(page.PageUrl, line);
+                    }
+                    log.WriteEntry("Found {0} absolute and {1} relative new urls", absoluteUrlCount, relativeUrlCount);
+                }
+
+                return page;
+            }
+            catch (HttpRequestException ex)
+            {
+                log.WriteEntry("Request failed: {0}", ex.Message);
+                return null;
+            }
+            catch (TaskCanceledException ex)
+            {
+                log.WriteEntry("Request timeout: {0}", ex.Message);
+                return null;
+            }
         }
 
         public WebPage CrawlNext()
@@ -125,9 +138,14 @@ namespace WebCrawlerCore
 
                 return page;
             }
-            catch(HttpRequestException ex)
+            catch (HttpRequestException ex)
             {
                 log.WriteEntry("Request failed: {0}", ex.Message);
+                return null;
+            }
+            catch (TaskCanceledException ex)
+            {
+                log.WriteEntry("Request timeout: {0}", ex.Message);
                 return null;
             }
         }
