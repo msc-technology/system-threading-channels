@@ -4,3 +4,4 @@ obj
 *.csproj.user
 *.pubxml
 *.pubxml.user
+crawler-*.zip
