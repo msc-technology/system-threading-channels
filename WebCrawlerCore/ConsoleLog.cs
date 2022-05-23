@@ -6,14 +6,16 @@ namespace WebCrawlerCore
     public class ConsoleLog : ILog
     {
         private readonly string ownerName;
+        private readonly string cid;
 
-        public static ILog Create<TOwner>() => new ConsoleLog(typeof(TOwner).Name);
-        public static ILog Create(Type owner) => new ConsoleLog(owner.Name);
-        public static ILog Create(string ownerName) => new ConsoleLog(ownerName);
+        public static ILog Create<TOwner>(string cid = null) => new ConsoleLog(typeof(TOwner).Name, cid);
+        public static ILog Create(Type owner, string cid = null) => new ConsoleLog(owner.Name, cid);
+        public static ILog Create(string ownerName, string cid = null) => new ConsoleLog(ownerName, cid);
 
-        private ConsoleLog(string ownerName)
+        private ConsoleLog(string ownerName, string cid)
         {
             this.ownerName = ownerName;
+            this.cid = cid;
         }
 
         public void WriteEntry(string format, params object[] values)
@@ -22,7 +24,13 @@ namespace WebCrawlerCore
 
             Console.Write("[thread:{0}]", threadId);
             Console.Write("[owner:{0}]", ownerName);
+            Console.Write("[cid:{0}]", cid ?? " ");
             Console.WriteLine(format, values);
+        }
+
+        public ILog CreateSubLog<TOwner>()
+        {
+            return new ConsoleLog(typeof(TOwner).Name, cid);
         }
     }
 }

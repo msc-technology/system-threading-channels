@@ -46,7 +46,7 @@ namespace ChannelsCrawler
 
         static async Task CrawlOneAsync(Uri url, ChannelWriter<WebPage> output, ILog log, int index)
         {
-            var crawler = new WebCrawler(new HttpClient(), ConsoleLog.Create<WebCrawler>(), url);
+            var crawler = new WebCrawler(new HttpClient(), ConsoleLog.Create<WebCrawler>(cid: url.Host), url);
 
             log.WriteEntry("[crawlerIx:{0}]Beginning crawl through {1}", index, url);
             while (!crawler.Done)

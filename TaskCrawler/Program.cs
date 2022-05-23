@@ -34,7 +34,7 @@ namespace TaskCrawler
                 log.WriteEntry("Created new archive {0}", resultsArchive);
 
                 var uris = args.Select(x => new Uri(x)).ToArray();
-                var crawlers = uris.Select(x => new WebCrawler(new HttpClient(), ConsoleLog.Create<WebCrawler>(), x)).ToArray();
+                var crawlers = uris.Select(x => new WebCrawler(new HttpClient(), ConsoleLog.Create<WebCrawler>(cid: x.Host), x)).ToArray();
 
                 foreach (var i in Enumerable.Range(0, uris.Length))
                     log.WriteEntry("[crawlerIx:{0}]Beginning crawl through {1}", i, uris[i]);

@@ -32,7 +32,7 @@ namespace SyncCrawler
                 programLog.WriteEntry("Created new archive {0}", resultsArchive);
 
                 var uris = args.Select(x => new Uri(x)).ToArray();
-                var crawlers = uris.Select(x => new WebCrawler(new HttpClient(), ConsoleLog.Create<WebCrawler>(), x)).ToArray();
+                var crawlers = uris.Select(x => new WebCrawler(new HttpClient(), ConsoleLog.Create<WebCrawler>(cid: x.Host), x)).ToArray();
                 var nextCrawlTimes = crawlers.Select(x => DateTime.MinValue).ToArray();
 
                 foreach (var i in Enumerable.Range(0, uris.Length))
